@@ -491,4 +491,598 @@ class Solution:
 
 ​    return max(arr) 
 
-​      
+# 双指针
+
+## Leetcode 284 移除0
+
+#### 思路1：用双指针，但第一次报错了，第一次直接把j赋值到i，然后就把j赋值为0，如果是【1】，最后就会被修改为【0】，所以就应该最后再遍历赋值一下，还有就是while一定要在while里面改变判断值
+
+```
+class Solution:
+
+  def moveZeroes(self, nums: List[int]) -> None:
+
+​    """
+
+​    Do not return anything, modify nums in-place instead.
+
+​    """
+
+​    i = 0
+
+​    for j in range(len(nums)):
+
+​      if nums[j] != 0:
+
+​        nums[i] = nums[j]
+
+​        i += 1
+
+​    k = i
+
+​    while k<len(nums):
+
+​      nums[k] = 0
+
+​      k += 1
+```
+
+但leetcode官方题解有一个简单思路，就是直接交换元素,
+
+class Solution:
+
+  def moveZeroes(self, nums: List[int]) -> None:
+
+​    n = len(nums)
+
+​    left = right = 0
+
+​    while right < n:
+
+​      if nums[right] != 0:
+
+​        nums[left], nums[right] = nums[right], nums[left]
+
+​        left += 1
+
+​      right += 1
+
+## Leetcode 11盛最多水的容器
+
+#### 思路1：最小的一边需要移动，easy
+
+```
+class Solution:
+
+  def maxArea(self, height: List[int]) -> int:
+
+​    i,j = 0,len(height)-1
+
+​    maxWater = -1
+
+​    while i<j :
+
+​      water = (j-i) * min(height[i],height[j])
+
+​      maxWater = max(water,maxWater)
+
+​      if height[i]<=height[j]:
+
+​        i += 1
+
+​      else:
+
+​        j -= 1
+
+​    return maxWater
+```
+
+
+
+## Leetcode 15 三数之和
+
+```
+claude题解：
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        result = []
+        
+        for i in range(len(nums) - 2):  # 只需要遍历到倒数第三个元素
+            # 跳过重复的第一个数
+            if i > 0 and nums[i] == nums[i-1]:
+                continue
+                
+            left = i + 1
+            right = len(nums) - 1
+            
+            while left < right:
+                current_sum = nums[i] + nums[left] + nums[right]
+                
+                if current_sum == 0:
+                    result.append([nums[i], nums[left], nums[right]])
+                    
+                    # 跳过重复的left值
+                    while left < right and nums[left] == nums[left + 1]:
+                        left += 1
+                    # 跳过重复的right值
+                    while left < right and nums[right] == nums[right - 1]:
+                        right -= 1
+                        
+                    left += 1
+                    right -= 1
+                    
+                elif current_sum < 0:
+                    left += 1
+                else:
+                    right -= 1
+                    
+        return result
+```
+
+自己写的没解决出来超过时间限制了o3n：
+
+```
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        result = []
+        for i in range(len(nums)):
+            if i-1>=0 and nums[i] == nums[i-1]:
+                continue
+            for j in range(i+1,len(nums)):
+                if j-1>i and nums[j] == nums[j-1]:
+                    continue
+                target = 0-nums[i]-nums[j]
+                k = len(nums)-1
+                while k>j:
+                    if k+1 < len(nums)-1 and nums[k] == nums[k+1]:
+                        continue
+                    if nums[k] > target:
+                        k -= 1
+                    elif nums[k] == target:
+                        temp = [nums[i],nums[j],nums[k]]
+                        result.append(temp)
+                        break
+                    elif nums[k] < target:
+                        break
+        return result
+            
+```
+
+
+
+## Leetcode42 接雨水
+
+ac了，但python遍历还是不太熟练，倒序遍历不会
+
+```
+class Solution:
+
+  def trap(self, height: List[int]) -> int:
+
+​    lenH = len(height)
+
+​    leftMax = [0] * lenH
+
+​    rightMax = [0] * lenH
+
+​    tempMaxLeft = 0
+
+​    tempMaxRight = 0
+
+
+
+​    \# 计算左侧最大值
+
+​    for i in range(lenH - 1):
+
+​      if height[i] > tempMaxLeft:
+
+​        tempMaxLeft = height[i]
+
+​        leftMax[i + 1] = tempMaxLeft
+
+​      else:
+
+​        leftMax[i + 1] = tempMaxLeft
+
+
+
+​    \# 计算右侧最大值
+
+​    j = lenH - 1
+
+​    while j > 0:
+
+​      if tempMaxRight < height[j]:
+
+​        tempMaxRight = height[j]
+
+​        rightMax[j - 1] = height[j]
+
+​      else:
+
+​        rightMax[j - 1] = tempMaxRight
+
+​      j -= 1
+
+
+
+​    \# 计算接水量
+
+​    maxResult = 0
+
+​    for i in range(lenH):
+
+​      if height[i] < min(leftMax[i], rightMax[i]):
+
+​        maxResult += min(leftMax[i], rightMax[i]) - height[i]
+
+
+
+​    return maxResult
+```
+
+## Leetcode 3 [无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
+
+#### 思路一：思路没问题，但只考虑到是字母了，没考虑到空格和数字等情况：,还有就是python中取char得用ord
+
+class Solution:
+
+  def lengthOfLongestSubstring(self, s: str) -> int:
+
+​    if s ==" ":
+
+​      return 1
+
+​    flags = [0]*26
+
+​    left ,right = 0 ,0
+
+​    maxLen = 0
+
+​    while right<len(s): #暂定
+
+​      if flags[ord(s[right])-ord('a')] == 0:
+
+​        flags[ord(s[right])-ord('a')] = 1
+
+​        right += 1
+
+​        maxLen = max(right-left,maxLen)
+
+​      else:
+
+​        while left<=right:
+
+​          if  ord(s[left])-ord('a') == ord(s[right])-ord('a'):
+
+​            flags[ord(s[left])-ord('a')] = 0
+
+​            left += 1
+
+​            break
+
+​          else:
+
+​            flags[ord(s[left])-ord('a')] = 0
+
+​            left += 1
+
+​        
+
+​    return maxLen
+
+
+
+
+
+#### 最终通过把列表换成collections.defaultdict解决问题：
+
+思路没问题，一直保证滑动窗口里是符合条件的
+
+```
+class Solution:
+
+  def lengthOfLongestSubstring(self, s: str) -> int:
+
+​    flags = collections.defaultdict(int)
+
+​    left ,right = 0 ,0
+
+​    maxLen = 0
+
+​    while right<len(s): #暂定
+
+​      if flags[ord(s[right])] == 0:
+
+​        flags[ord(s[right])] = 1
+
+​        right += 1
+
+​        maxLen = max(right-left,maxLen)
+
+​      else:
+
+​        while left<=right:
+
+​          if  ord(s[left]) == ord(s[right]):
+
+​            flags[ord(s[left])] = 0
+
+​            left += 1
+
+​            break
+
+​          else:
+
+​            flags[ord(s[left])] = 0
+
+​            left += 1
+
+  
+
+​    return maxLen
+```
+
+## Leetcode 438 [找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
+
+#### 思路1：滑动窗口
+
+```
+
+class Solution:
+
+  def judgeSame(self,arr1,arr2):
+
+​    for i in range(26):
+
+​      if arr1[i] != arr2[i]:
+
+​        return False  #python中true和false是小写
+
+​    return True
+
+  def findAnagrams(self, s: str, p: str) -> List[int]:
+
+​    answerArr = [0] * 26
+
+​    tempArr = [0] * 26
+
+​    lenP = len(p)
+
+​    lenS = len(s)
+
+​    for i in p:
+
+​      answerArr[ord(i)-ord('a')] += 1
+
+​    left , right = 0 , 0
+
+​    result = []
+
+​    while right <= lenS and left <= right:
+
+​      if right - left <lenP :
+
+​        if right<lenS:
+
+​          tempArr[ord(s[right])-ord('a')] += 1
+
+​        right += 1
+
+​      else:
+
+​        if self.judgeSame(answerArr,tempArr):
+
+​          result.append(left)
+
+
+
+​        tempArr[ord(s[left])-ord('a')] -= 1
+
+​        left += 1
+
+​    return result
+```
+
+## Leetcode53 最大子数组和
+
+#### 思路1：第一次就解决，思路就是只要左边包含的数组的值和大于0就继续加，如果小于0就舍弃从头开始，一定要看测试数据的取值范围，比如这个数组最少一个元素，所以初始的时候可以用第一个元素来初始最大数组。
+
+float inf和float-inf可以代替python中最大值和最小值：maxResult = float('-inf') 
+
+```
+class Solution:
+
+  def maxSubArray(self, nums: List[int]) -> int:
+
+​    maxResult = nums[0] #等会计算什么是最大最小
+
+​    lenLeft,lenRight = 0,0
+
+​    tempResult = 0
+
+​    while lenRight<len(nums):
+
+​      if tempResult<0:
+
+​        lenLeft = lenRight
+
+​        tempResult = 0
+
+​      else:
+
+​        tempResult = tempResult + nums[lenRight]
+
+​        if tempResult>maxResult:
+
+​          maxResult = tempResult
+
+​        lenRight += 1
+
+​    return maxResult
+```
+
+   
+
+
+
+## Leetcode56 合并区间
+
+#### 思路1：有思路，但问题是按第一个元素排序有点难操作，常用的排序算法还不会手撕
+
+自己手写了个冒泡排序，先确定排几轮，再每一轮少一个数...这个代码没考虑到只有一个的情况
+
+```
+class Solution:
+
+  def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+
+​    \# 第一步排序数组，先正序
+
+​    for i in range(len(intervals)-1):
+
+​      for j in range(len(intervals)-i-1):
+
+​        if intervals[j][0]>intervals[j+1][0]:
+
+​          intervals[j],intervals[j+1] = intervals[j+1],intervals[j]
+
+​    result = []
+
+​    for i in range(len(intervals)-1):
+
+​      if intervals[i][1] >= intervals[i+1][1]:
+
+​        intervals[i+1] =  intervals[i]
+
+​      elif intervals[i][1]>=intervals[i+1][0]:
+
+​        intervals[i+1][0] =  intervals[i][0]
+
+​      else:
+
+​        result.append(intervals[i])
+
+​      if i == len(intervals)-2:
+
+​        result.append(intervals[i+1])
+
+​    return result
+```
+
+通过是通过了，击败百分之五，我真服了
+
+
+
+#### 思路2：官方题解思路，其实相当于把我的代码的冒号排序改成sort函数
+
+> class Solution:
+>
+>   def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+>
+> ​    if len(intervals)==1:
+>
+> ​      return intervals
+>
+> ​    \# 第一步排序数组，先正序
+>
+> ​    intervals.sort(key=lambda x: x[0])
+>
+> ​    result = []
+>
+> ​    for i in range(len(intervals)-1):
+>
+> ​      if intervals[i][1] >= intervals[i+1][1]:
+>
+> ​        intervals[i+1] =  intervals[i]
+>
+> ​      elif intervals[i][1]>=intervals[i+1][0]:
+>
+> ​        intervals[i+1][0] =  intervals[i][0]
+>
+> ​      else:
+>
+> ​        result.append(intervals[i])
+>
+> ​      if i == len(intervals)-2:
+>
+> ​        result.append(intervals[i+1])
+>
+> ​    return result
+
+## Leetcode189 轮转数组
+
+#### 思路1：直接找一个空间暂存：
+
+class Solution:
+
+  def rotate(self, nums: List[int], k: int) -> None:
+
+​    """
+
+​    Do not return anything, modify nums in-place instead.
+
+​    """
+
+​    k = k % len(nums)
+
+​    temp = nums[0:len(nums)-k]
+
+​    nums[0:k] = nums[len(nums)-k:]
+
+​    nums[k:] = temp
+
+#### 思路2：很好，三次反转
+
+![image-20250917205634945](./assets/image-20250917205634945.png)
+
+    class Solution:
+        def reverse(self, nums: List[int], start: int, end: int) -> None:
+            """反转数组中从start到end（包含）的元素"""
+            while start < end:
+    
+    ​            nums[start], nums[end] = nums[end], nums[start]
+    ​            start += 1
+    ​            end -= 1
+    ​    
+    def rotate(self, nums: List[int], k: int) -> None:
+        """
+        原地将数组向右旋转k个位置
+        不返回任何值，直接修改输入数组
+        """
+        n = len(nums)
+        # 处理k大于数组长度的情况
+        k %= n
+        
+        # 三次反转实现旋转
+        self.reverse(nums, 0, n - 1)          # 反转整个数组
+        self.reverse(nums, 0, k - 1)          # 反转前k个元素
+        self.reverse(nums, k, n - 1)          # 反转剩余元素
+
+## Leetcode238 除自身以外数组的乘积
+
+#### 思路1：两次遍历，记录左边和右边，然后乘起来。记住range的范围是不包含的，也就是range(0,0,-1)是不执行的，不包含第二个0.  只击败了百分之十六
+
+```
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        leftMul = [1] * len(nums)
+        rightMul = [1] * len(nums)
+        mul = 1
+        for i in range(1,len(nums)):
+            leftMul[i] = mul*nums[i-1]
+            mul = leftMul[i]
+        mul = 1
+        for i in range(len(nums)-2,-1,-1):
+            rightMul[i] = mul*nums[i+1]
+            mul = rightMul[i]
+        
+        for i in range(len(nums)):
+            nums[i] = leftMul[i]*rightMul[i]
+        return nums
+```
+
+#### 官方题解：
